@@ -1,48 +1,80 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'screens/splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'screens/welcome_page.dart'; 
 import 'screens/sign_in_page.dart';
 import 'screens/sign_up_page.dart'; 
+import 'screens/user_selection_page.dart';
+import 'rider/rider_home.dart';
+import 'vendor/vendor_order_manager.dart';
+import 'buyer/buyer_home.dart';
 
-void main() {
-  // Ensure framework bindings are ready before setting system configurations
+void main() async {
+  // Ensure Flutter engine bindings are initialized before accessing SharedPreferences
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Set premium UI status bar overlays matching top food apps
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent, 
-    statusBarIconBrightness: Brightness.dark, // Dark status bar text on light backgrounds
-    statusBarBrightness: Brightness.light,    // For iOS device compatibility
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
   ));
 
-  runApp(const DropchopApp());
+  // Fetch the local storage variables
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  final String? savedRole = prefs.getString('userRole');
+
+  // Default to welcome page
+  String initialRoute = '/welcome';
+
+  // Only route to a home page if they are explicitly logged in
+  if (isLoggedIn) {
+    switch (savedRole) {
+      case 'buyer':
+        initialRoute = '/buyerHome';
+        break;
+      case 'rider':
+        initialRoute = '/riderHome';
+        break;
+      case 'vendor':
+        initialRoute = '/vendorHome';
+        break;
+      default:
+        // Logged in but somehow lost their role assignment? Send them to choose.
+        initialRoute = '/selectUser';
+    }
+  }
+
+  runApp(DropchopApp(initialRoute: initialRoute));
 }
 
 class DropchopApp extends StatelessWidget {
-  const DropchopApp({super.key});
+  final String initialRoute;
+  const DropchopApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Dropchop',
+      title: 'DropChop',
       theme: ThemeData(
         useMaterial3: true,
         primaryColor: const Color(0xFF32BB78),
         colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF32BB78),
-        primary: const Color(0xFF32BB78),
-           ),
+          seedColor: const Color(0xFF32BB78),
+          primary: const Color(0xFF32BB78),
+        ),
       ),
-      // Define named routing map for scalability
-      initialRoute: '/',
+      initialRoute: initialRoute,
       routes: {
-        '/': (context) => const DropchopSplashScreen(),
-        '/home': (context) => const WelcomePage(),
+        '/welcome': (context) => const WelcomePage(),
         '/signin': (context) => const SignInPage(),
         '/signup': (context) => const SignUpPage(),
-         
+        '/selectUser': (context) => const UserSelectionPage(),
+        '/riderHome': (context) => const RiderHomePage(),
+        '/vendorHome': (context) => const VendorOrderManagerScreen(),
+        '/buyerHome': (context) => const BuyerHomePage(),
       },
     );
   }
