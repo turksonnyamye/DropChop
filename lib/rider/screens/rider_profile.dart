@@ -18,42 +18,20 @@ class RiderProfileScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        // Driver Identity Frame
-        Center(
+        const Center(
           child: Column(
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 46,
                 backgroundColor: Color(0xFF32BB78),
                 child: Icon(Icons.sports_motorsports, size: 50, color: Colors.white),
               ),
-              const SizedBox(height: 16),
-              Text('Alex Rider Fleet', style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.bold)),
-              Container(
-                margin: const EdgeInsets.only(top: 6),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(20)),
-                child: Text('GOLD LEVEL DRIVER', style: GoogleFonts.inter(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900)),
-              )
+              SizedBox(height: 16),
+              Text('Alex Rider Fleet', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
-        const SizedBox(height: 32),
-
-        // Stars & Performance Scorecards
-        Row(
-          children: [
-            _buildMetricBox('User Rating', '4.92 ★', Colors.amber),
-            const SizedBox(width: 12),
-            _buildMetricBox('Acceptance', '98%', Colors.blue),
-          ],
-        ),
         const SizedBox(height: 40),
-
-        Text('Account Actions', style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16)),
-        const Divider(),
-        const SizedBox(height: 8),
-
         SizedBox(
           width: double.infinity,
           height: 54,
@@ -70,23 +48,6 @@ class RiderProfileScreen extends StatelessWidget {
           ),
         )
       ],
-    );
-  }
-
-  Widget _buildMetricBox(String title, String data, Color themeColor) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: GoogleFonts.inter(color: Colors.grey, fontSize: 12)),
-            const SizedBox(height: 4),
-            Text(data, style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w900, color: themeColor)),
-          ],
-        ),
-      ),
     );
   }
 }

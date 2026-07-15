@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../widgets/stat_card.dart';
 
 class RiderDashboardScreen extends StatelessWidget {
   final List<Map<String, String>> activeOrders;
@@ -20,95 +19,221 @@ class RiderDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Dynamic percentage tracking based on a daily driver target goal of $150
+    // Premium customizable metrics
     double dailyGoal = 150.0;
     double progressPercent = (dailyEarnings / dailyGoal).clamp(0.0, 1.0);
 
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        Text('Performance Desk', style: GoogleFonts.inter(fontSize: 26, fontWeight: FontWeight.w900)),
+        // Title Header
+        Text(
+          'Performance Desk', 
+          style: GoogleFonts.inter(
+            fontSize: 26, 
+            fontWeight: FontWeight.w900, 
+            color: const Color(0xFF1E293B),
+          ),
+        ),
         const SizedBox(height: 24),
-
-        // ADVANCED RADAR RADIAL RING DISPLAY CONTAINER
+        
+        // Premium Dark Slate Gradient Wallet Card
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(32),
-          ),
-          child: Row(
-            children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 90,
-                    height: 90,
-                    child: CircularProgressIndicator(
-                      value: progressPercent,
-                      strokeWidth: 10,
-                      backgroundColor: Colors.white.withOpacity(0.1),
-                      valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF32BB78)),
-                    ),
-                  ),
-                  Text(
-                    '${(progressPercent * 100).toInt()}%',
-                    style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-                  )
-                ],
-              ),
-              const SizedBox(width: 24),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('SHIFT TARGET GOAL', style: GoogleFonts.inter(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 4),
-                    Text('\$${dailyEarnings.toStringAsFixed(2)} / \$150', style: GoogleFonts.inter(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
-                    const SizedBox(height: 6),
-                    Text('Complete more pipeline jobs to hit daily target rewards.', style: GoogleFonts.inter(color: Colors.grey.shade400, fontSize: 12)),
-                  ],
-                ),
+            gradient: const LinearGradient(
+              colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF0F172A).withOpacity(0.12),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               )
             ],
           ),
-        ),
-        const SizedBox(height: 24),
-
-        Row(
-          children: [
-            StatCard(title: 'Active Runs', value: '${activeOrders.length}', icon: Icons.motorcycle, iconColor: Colors.purple),
-            const SizedBox(width: 12),
-            StatCard(title: 'Finished Trips', value: '$completedTrips', icon: Icons.task_alt, iconColor: const Color(0xFF32BB78)),
-          ],
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'TODAY\'S WALLET', 
+                        style: GoogleFonts.inter(
+                          color: Colors.white60, 
+                          fontSize: 11, 
+                          fontWeight: FontWeight.bold, 
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'GHS ${dailyEarnings.toStringAsFixed(2)}', 
+                        style: GoogleFonts.inter(
+                          color: Colors.white, 
+                          fontSize: 32, 
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  // Radial Goal Progress Tracker
+                  SizedBox(
+                    height: 56,
+                    width: 56,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CircularProgressIndicator(
+                          value: progressPercent,
+                          backgroundColor: Colors.white10,
+                          strokeWidth: 6,
+                          color: const Color(0xFF32BB78),
+                        ),
+                        Center(
+                          child: Text(
+                            '${(progressPercent * 100).toInt()}%',
+                            style: GoogleFonts.inter(
+                              color: Colors.white, 
+                              fontSize: 12, 
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              const Divider(color: Colors.white10, height: 1),
+              const SizedBox(height: 16),
+              
+              // Secondary Mini-Stats row inside Wallet Card
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.sports_motorsports_outlined, color: Colors.white54, size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        '$completedTrips Completed Runs',
+                        style: GoogleFonts.inter(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    'Goal: GHS ${dailyGoal.toStringAsFixed(0)}',
+                    style: GoogleFonts.inter(color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 32),
-
-        Text('Duty Settlement Logs', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold)),
+        
+        // Logs Segment
+        Text(
+          'Duty Settlement Logs', 
+          style: GoogleFonts.inter(
+            fontSize: 18, 
+            fontWeight: FontWeight.bold, 
+            color: const Color(0xFF1E293B),
+          ),
+        ),
         const SizedBox(height: 16),
-
+        
+        // Dynamic completion list view conditional check
         if (completedHistory.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 40),
-            child: Center(child: Text('No job manifests processed today.', style: GoogleFonts.inter(color: Colors.grey))),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.history_toggle_off_rounded, size: 48, color: Colors.grey.shade400),
+                  const SizedBox(height: 12),
+                  Text(
+                    'No job manifests processed today.', 
+                    style: GoogleFonts.inter(
+                      color: Colors.grey, 
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           )
         else
           ...completedHistory.reversed.map((item) => Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.white, 
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.02),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Text(item['vendorName'] ?? 'App Vendor Order', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
-                        Text('Manifest Ref #${item['id']}', style: GoogleFonts.inter(color: Colors.grey, fontSize: 12)),
+                        // Completion Badge
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8F8F0),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.check_circle_rounded, color: Color(0xFF32BB78), size: 20),
+                        ),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item['vendorName'] ?? 'App Vendor Order', 
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w800, 
+                                color: const Color(0xFF1E293B),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Manifest Ref #${item['id']}', 
+                              style: GoogleFonts.inter(
+                                color: Colors.grey.shade500, 
+                                fontSize: 12, 
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                    Text('+\$${item['payout']}', style: GoogleFonts.inter(fontWeight: FontWeight.w900, color: const Color(0xFF32BB78), fontSize: 16)),
+                    Text(
+                      '+GHS ${item['payout']}', 
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w900, 
+                        color: const Color(0xFF32BB78), 
+                        fontSize: 16,
+                      ),
+                    ),
                   ],
                 ),
               )),

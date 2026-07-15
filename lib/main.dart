@@ -7,11 +7,10 @@ import 'screens/sign_in_page.dart';
 import 'screens/sign_up_page.dart'; 
 import 'screens/user_selection_page.dart';
 import 'rider/rider_home.dart';
-import 'vendor/vendor_order_manager.dart';
-import 'buyer/buyer_home.dart';
+import 'vendor/vendor_home.dart';
+import 'buyer/buyer_page.dart'; // Renamed standard snake_case file path
 
 void main() async {
-  // Ensure Flutter engine bindings are initialized before accessing SharedPreferences
   WidgetsFlutterBinding.ensureInitialized();
   
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -20,15 +19,12 @@ void main() async {
     statusBarBrightness: Brightness.light,
   ));
 
-  // Fetch the local storage variables
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
   final String? savedRole = prefs.getString('userRole');
 
-  // Default to welcome page
   String initialRoute = '/welcome';
 
-  // Only route to a home page if they are explicitly logged in
   if (isLoggedIn) {
     switch (savedRole) {
       case 'buyer':
@@ -41,7 +37,6 @@ void main() async {
         initialRoute = '/vendorHome';
         break;
       default:
-        // Logged in but somehow lost their role assignment? Send them to choose.
         initialRoute = '/selectUser';
     }
   }
@@ -72,9 +67,9 @@ class DropchopApp extends StatelessWidget {
         '/signin': (context) => const SignInPage(),
         '/signup': (context) => const SignUpPage(),
         '/selectUser': (context) => const UserSelectionPage(),
+        '/buyerHome': (context) => const BuyerPage(),
         '/riderHome': (context) => const RiderHomePage(),
-        '/vendorHome': (context) => const VendorOrderManagerScreen(),
-        '/buyerHome': (context) => const BuyerHomePage(),
+        '/vendorHome': (context) => const VendorHomePage(),
       },
     );
   }

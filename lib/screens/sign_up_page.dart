@@ -31,13 +31,37 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _handleSignUp() async {
-    if (_agreeToTerms) {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/selectUser');
-      }
+    final String name = _nameController.text.trim();
+    final String email = _emailController.text.trim();
+    final String password = _passwordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill out all fields'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    if (!_agreeToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You must agree to the Terms & Privacy Policy to proceed'),
+          backgroundColor: Colors.orangeAccent,
+        ),
+      );
+      return;
+    }
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+    await prefs.setString('userName', name);
+    await prefs.setString('userEmail', email);
+    
+    if (mounted) {
+      Navigator.of(context).pushReplacementNamed('/selectUser');
     }
   }
 
@@ -46,92 +70,91 @@ class _SignUpPageState extends State<SignUpPage> {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: brandGreen,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: textDark),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       body: SafeArea(
-        bottom: false,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_ios, color: textLight, size: 22),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushReplacementNamed('/signin');
-                        },
-                        child: Text(
-                          'Sign In',
-                          style: GoogleFonts.inter(color: textLight, fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: screenHeight * 0.025),
                   Text(
                     'Create Account',
-                    style: GoogleFonts.inter(fontSize: 34, fontWeight: FontWeight.w800, color: textLight),
+                    style: GoogleFonts.inter(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      color: textDark,
+                      letterSpacing: -1.0,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Join DropChop today and get fresh meals delivered fast.',
-                    style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w400, color: textLight.withOpacity(0.85)),
+                    'Register now to access local food delivery or manage stores.',
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      color: Colors.grey.shade600,
+                      height: 1.4,
+                    ),
                   ),
                 ],
               ),
             ),
+            const SizedBox(height: 20),
             Expanded(
               child: Container(
-                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40)),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
                 ),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 35),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextField(
                         controller: _nameController,
-                        textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
-                          hintText: 'Enter your full name',
-                          prefixIcon: const Icon(Icons.person_outline, size: 22),
+                          hintText: 'Full Name',
+                          hintStyle: GoogleFonts.inter(color: Colors.grey.shade500),
+                          prefixIcon: const Icon(Icons.person_outline_rounded, size: 22, color: Colors.grey),
                           fillColor: inputBackground,
                           filled: true,
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       TextField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
-                          hintText: 'name@example.com',
-                          prefixIcon: const Icon(Icons.mail_outline, size: 22),
+                          hintText: 'Email Address',
+                          hintStyle: GoogleFonts.inter(color: Colors.grey.shade500),
+                          prefixIcon: const Icon(Icons.mail_outline_rounded, size: 22, color: Colors.grey),
                           fillColor: inputBackground,
                           filled: true,
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       TextField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
-                        textInputAction: TextInputAction.done,
-                        onSubmitted: (_) => _handleSignUp(),
                         decoration: InputDecoration(
-                          hintText: 'Create a secure password',
-                          prefixIcon: const Icon(Icons.lock_outline, size: 22),
+                          hintText: 'Password',
+                          hintStyle: GoogleFonts.inter(color: Colors.grey.shade500),
+                          prefixIcon: const Icon(Icons.lock_outline_rounded, size: 22, color: Colors.grey),
                           suffixIcon: IconButton(
                             icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 22, color: Colors.grey),
                             onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
@@ -141,15 +164,15 @@ class _SignUpPageState extends State<SignUpPage> {
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
                         ),
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 18),
                       Row(
                         children: [
                           Checkbox(
                             value: _agreeToTerms,
                             activeColor: brandGreen,
-                            onChanged: (bool? value) => setState(() => _agreeToTerms = value ?? false),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                            onChanged: (val) => setState(() => _agreeToTerms = val ?? false),
                           ),
-                          const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               'I agree to the Terms of Service & Privacy Policy',

@@ -30,7 +30,6 @@ class _SignInPageState extends State<SignInPage> {
     final String username = _usernameController.text.trim();
     final String password = _passwordController.text.trim();
 
-    // Simple validation check before logging in
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter your username and password')),
@@ -39,12 +38,10 @@ class _SignInPageState extends State<SignInPage> {
     }
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    
-    // Save that the user has securely authenticated
     await prefs.setBool('isLoggedIn', true);
-    
+    await prefs.setString('username', username);
+
     if (mounted) {
-      // Send them to choose their interface role (Rider, Vendor, or Buyer)
       Navigator.of(context).pushReplacementNamed('/selectUser');
     }
   }
@@ -54,87 +51,98 @@ class _SignInPageState extends State<SignInPage> {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: brandGreen,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: textDark),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       body: SafeArea(
-        bottom: false,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_ios, color: textLight, size: 22),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushReplacementNamed('/signup');
-                        },
-                        child: Text(
-                          'Register',
-                          style: GoogleFonts.inter(color: textLight, fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: screenHeight * 0.03),
                   Text(
-                    'Sign In',
-                    style: GoogleFonts.inter(fontSize: 34, fontWeight: FontWeight.w800, color: textLight),
+                    'Welcome Back',
+                    style: GoogleFonts.inter(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      color: textDark,
+                      letterSpacing: -1.0,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Welcome back! Sign in to resume your orders.',
-                    style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w400, color: textLight.withOpacity(0.85)),
+                    'Sign in to manage operations or order your next delivery.',
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      color: Colors.grey.shade600,
+                      height: 1.4,
+                    ),
                   ),
-                  SizedBox(height: screenHeight * 0.03),
                 ],
               ),
             ),
+            const SizedBox(height: 20),
             Expanded(
               child: Container(
-                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40)),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
                 ),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextField(
                         controller: _usernameController,
-                        textInputAction: TextInputAction.next,
+                        keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          hintText: 'Enter your username or email',
-                          prefixIcon: const Icon(Icons.person_outline, size: 22),
+                          hintText: 'Email or Username',
+                          hintStyle: GoogleFonts.inter(color: Colors.grey.shade500),
+                          prefixIcon: const Icon(Icons.mail_outline_rounded, size: 22, color: Colors.grey),
                           fillColor: inputBackground,
                           filled: true,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 18),
                       TextField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
-                        textInputAction: TextInputAction.done,
-                        onSubmitted: (_) => _handleSignIn(),
                         decoration: InputDecoration(
-                          hintText: 'Enter your password',
-                          prefixIcon: const Icon(Icons.lock_outline, size: 22),
+                          hintText: 'Password',
+                          hintStyle: GoogleFonts.inter(color: Colors.grey.shade500),
+                          prefixIcon: const Icon(Icons.lock_outline_rounded, size: 22, color: Colors.grey),
                           suffixIcon: IconButton(
-                            icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 22, color: Colors.grey),
+                            icon: Icon(
+                              _obscurePassword 
+                                  ? Icons.visibility_off_outlined 
+                                  : Icons.visibility_outlined, 
+                              size: 22, 
+                              color: Colors.grey,
+                            ),
                             onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                           ),
                           fillColor: inputBackground,
                           filled: true,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                       ),
                       SizedBox(height: screenHeight * 0.04),

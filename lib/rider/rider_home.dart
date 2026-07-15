@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../state_controller.dart';
 import 'screens/rider_dashboard.dart';
 import 'screens/available_orders.dart';
 import 'screens/rider_profile.dart';
-import 'widgets/vendor_details_sheet.dart'; // Import newly created file
+import 'widgets/vendor_details_sheet.dart'; 
 
 class RiderHomePage extends StatefulWidget {
   const RiderHomePage({super.key});
@@ -13,130 +14,129 @@ class RiderHomePage extends StatefulWidget {
 }
 
 class _RiderHomePageState extends State<RiderHomePage> {
-  int _currentIndex = 1; // Opens default view to Map Run
-
-  double _dailyEarnings = 0.00;
-  int _completedTrips = 0;
+  int _currentIndex = 1; // Opens default Map view
+  final DropChopStateController _stateController = DropChopStateController();
   String _currentStepStatus = 'Available'; 
-  Map<String, String>? _activeTripData;
+  CentralOrder? _activeTripData;
 
-  // Global ledger arrays mapping historical completions
-  final List<Map<String, String>> _completionHistory = [];
+  @override
+  void initState() {
+    super.initState();
+    _stateController.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
 
-  // Vendor profiles injected inside assignments schema
-  final List<Map<String, String>> _jobsPool = [
-    {
-      'id': '2019', 
-      'pickup': 'Burger King, Block B', 
-      'drop': 'Suite 12, Diamond Estates', 
-      'payout': '9.50',
-      'vendorName': 'Burger King Express',
-      'vendorRating': '4.5'
-    },
-    {
-      'id': '8842', 
-      'pickup': 'KFC, Galleria Mall', 
-      'drop': '45 Cantonment Close', 
-      'payout': '14.20',
-      'vendorName': 'KFC Galleria',
-      'vendorRating': '4.2'
-    },
-  ];
-
-  void _acceptOfferConfirmation(Map<String, String> selectedJob) {
-    showDialog(
+  void _acceptOfferConfirmation(CentralOrder job) {
+    showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircleAvatar(radius: 32, backgroundColor: Color(0xFF32BB78), child: Icon(Icons.flash_on, color: Colors.white, size: 36)),
-                const SizedBox(height: 16),
-                Text('Accept Dispatch?', style: GoogleFonts.inter(fontWeight: FontWeight.w800, fontSize: 20)),
-                const SizedBox(height: 16),
-                Text('Vendor Match: ${selectedJob['vendorName']}', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Decline'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF32BB78)),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          setState(() {
-                            _jobsPool.removeWhere((item) => item['id'] == selectedJob['id']);
-                            _activeTripData = selectedJob;
-                            _currentStepStatus = 'Routing to Vendor';
-                          });
-                        },
-                        child: const Text('Accept', style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-        );
-      },
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => VendorDetailsSheet(
+        job: {
+          'id': job.id,
+          'pickup': job.pickupLocation,
+          'drop': job.dropoffLocation,
+          'payout': (job.total * 0.15).toStringAsFixed(2),
+          'vendorName': job.vendorName,
+          'vendorRating': job.riderRating
+        },
+        onConfirmPickup: () {
+          setState(() {
+            _activeTripData = job;
+            _stateController.assignRiderToOrder(job.id, 'Alex Rider Fleet');
+            _currentStepStatus = 'Accepted';
+          });
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 
   void _advanceDeliveryStepEngine() {
-    if (_currentStepStatus == 'Routing to Vendor') {
-      // POP UP THE INTERACTIVE VENDOR INVENTORY CHECKLIST SHEET
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24))),
-        builder: (context) => VendorDetailsSheet(
-          job: _activeTripData!,
-          onConfirmPickup: () {
-            Navigator.pop(context); // Dismiss sheet
-            setState(() => _currentStepStatus = 'En Route to Customer');
-          },
-        ),
-      );
-    } else if (_currentStepStatus == 'En Route to Customer') {
-      final double earningsValue = double.parse(_activeTripData?['payout'] ?? '0.00');
+    if (_activeTripData == null) return;
+
+    setState(() {
+      if (_currentStepStatus == 'Accepted') {
+        _currentStepStatus = 'Arrived';
+      } else if (_currentStepStatus == 'Arrived') {
+        _currentStepStatus = 'Picked Up';
+      } else if (_currentStepStatus == 'Picked Up') {
+        _completeActiveOrder(_activeTripData!.id);
+      }
+    });
+  }
+
+  void _completeActiveOrder(String orderId) {
+    if (_activeTripData != null && _activeTripData!.id == orderId) {
+      final double payoutValue = double.parse((_activeTripData!.total * 0.15).toStringAsFixed(2));
+      _stateController.completeOrder(orderId, payoutValue);
+      
       setState(() {
-        _dailyEarnings += earningsValue;
-        _completedTrips += 1;
-        _completionHistory.add(_activeTripData!); // Feed dashboard history tracking
         _activeTripData = null;
         _currentStepStatus = 'Available';
-        _currentIndex = 0; // Snap to stats view
       });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Payout and delivery statistics synchronized successfully!'),
+          backgroundColor: Color(0xFF32BB78),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Collect ready orders from controller
+    final availableJobs = _stateController.orders
+        .where((o) => o.status == OrderState.readyForPickup && o.assignedRider == null)
+        .toList();
+
+    final activeHistory = _stateController.orders
+        .where((o) => o.status == OrderState.delivered)
+        .map((o) => {
+          'id': o.id,
+          'vendorName': o.vendorName,
+          'payout': (o.total * 0.15).toStringAsFixed(2)
+        }).toList();
+
     final List<Widget> screens = [
       RiderDashboardScreen(
-        activeOrders: _activeTripData != null ? [_activeTripData!] : [],
-        completedHistory: _completionHistory,
-        dailyEarnings: _dailyEarnings,
-        completedTrips: _completedTrips,
-        onCompleteOrder: (_) {},
+        activeOrders: _activeTripData != null ? [{
+          'id': _activeTripData!.id,
+          'pickup': _activeTripData!.pickupLocation,
+          'drop': _activeTripData!.dropoffLocation,
+          'payout': (_activeTripData!.total * 0.15).toStringAsFixed(2),
+          'vendorName': _activeTripData!.vendorName,
+        }] : [],
+        completedHistory: activeHistory,
+        dailyEarnings: _stateController.dailyEarnings,
+        completedTrips: _stateController.completedTrips,
+        onCompleteOrder: _completeActiveOrder,
       ),
       AvailableOrdersScreen(
-        availableJobs: _jobsPool,
-        ongoingJob: _activeTripData,
+        availableJobs: availableJobs.map((o) => {
+          'id': o.id,
+          'pickup': o.pickupLocation,
+          'drop': o.dropoffLocation,
+          'payout': (o.total * 0.15).toStringAsFixed(2),
+          'vendorName': o.vendorName,
+          'vendorRating': o.riderRating
+        }).toList(),
+        ongoingJob: _activeTripData != null ? {
+          'id': _activeTripData!.id,
+          'pickup': _activeTripData!.pickupLocation,
+          'drop': _activeTripData!.dropoffLocation,
+          'payout': (_activeTripData!.total * 0.15).toStringAsFixed(2),
+          'vendorName': _activeTripData!.vendorName,
+        } : null,
         currentDeliveryStep: _currentStepStatus,
-        onAcceptJob: _acceptOfferConfirmation,
+        onAcceptJob: (jobMap) {
+          final matchedOrder = _stateController.orders.firstWhere((o) => o.id == jobMap['id']);
+          _acceptOfferConfirmation(matchedOrder);
+        },
         onAdvanceStep: _advanceDeliveryStepEngine,
       ),
       const RiderProfileScreen(),
@@ -147,7 +147,7 @@ class _RiderHomePageState extends State<RiderHomePage> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text('DropChop Dispatch', style: GoogleFonts.inter(color: Colors.black, fontWeight: FontWeight.w800, fontSize: 18)),
+        title: Text('DropChop Dispatch', style: GoogleFonts.inter(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 18)),
         centerTitle: true,
       ),
       body: SafeArea(child: screens[_currentIndex]),
@@ -158,9 +158,9 @@ class _RiderHomePageState extends State<RiderHomePage> {
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Stats'),
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map Run'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.analytics_rounded), label: 'Analytics'),
+          BottomNavigationBarItem(icon: Icon(Icons.explore_rounded), label: 'Map Run'),
+          BottomNavigationBarItem(icon: Icon(Icons.sports_motorsports_rounded), label: 'Profile'),
         ],
       ),
     );

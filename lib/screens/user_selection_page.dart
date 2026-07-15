@@ -16,7 +16,6 @@ class UserSelectionPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios_new_rounded,
@@ -40,150 +39,48 @@ class UserSelectionPage extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-              /// ===========================
-              /// HERO HEADER
-              /// ===========================
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  gradient: const LinearGradient(
-                    colors: [
-                      brandGreen,
-                      brandDark,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: brandGreen.withOpacity(.30),
-                      blurRadius: 30,
-                      offset: const Offset(0, 12),
-                    )
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const CircleAvatar(
-                      radius: 32,
-                      backgroundColor: Colors.white24,
-                      child: Icon(
-                        Icons.delivery_dining_rounded,
-                        color: Colors.white,
-                        size: 36,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      "Welcome to",
-                      style: GoogleFonts.inter(
-                        color: Colors.white70,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "DropChop",
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontSize: 34,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      "Choose how you'd like to use the app today.",
-                      style: GoogleFonts.inter(
-                        color: Colors.white.withOpacity(.9),
-                        fontSize: 15,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        _infoChip(
-                          Icons.fastfood_rounded,
-                          "500+ Restaurants",
-                        ),
-                        _infoChip(
-                          Icons.delivery_dining,
-                          "Fast Delivery",
-                        ),
-                        _infoChip(
-                          Icons.verified,
-                          "Trusted Service",
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(height: 30),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Select your role",
-                    style: GoogleFonts.inter(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-              ),
               const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    _buildSelectionCard(
-                      context: context,
-                      title: "BUYER",
-                      subtitle: "Order food, groceries and everyday essentials instantly.",
-                      icon: Icons.fastfood_rounded,
-                      routeName: "/buyerHome",
-                    ),
-                    const SizedBox(height: 18),
-                    _buildSelectionCard(
-                      context: context,
-                      title: "RIDER",
-                      subtitle: "Accept deliveries, earn money and track your income.",
-                      icon: Icons.delivery_dining_rounded,
-                      routeName: "/riderHome",
-                    ),
-                    const SizedBox(height: 18),
-                    _buildSelectionCard(
-                      context: context,
-                      title: "VENDOR",
-                      subtitle: "Manage your restaurant and receive customer orders.",
-                      icon: Icons.store_mall_directory_rounded,
-                      routeName: "/vendorHome",
-                    ),
-                  ],
+              Text(
+                "Choose Your Role",
+                style: GoogleFonts.inter(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.black87,
                 ),
               ),
-              const SizedBox(height: 35),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: Text(
-                  "You can change your role later from your account settings.",
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: Colors.grey.shade600,
-                    fontSize: 14,
-                  ),
+              const SizedBox(height: 8),
+              Text(
+                "Select how you want to interact with DropChop",
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade500,
                 ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 30),
+              _buildRoleCard(
+                context: context,
+                title: "Buyer",
+                subtitle: "Order mouthwatering meals from top vendors near you.",
+                icon: Icons.shopping_bag_outlined,
+                routeName: '/buyerHome',
+              ),
+              _buildRoleCard(
+                context: context,
+                title: "Rider",
+                subtitle: "Deliver orders across Accra and earn high payouts.",
+                icon: Icons.sports_motorsports_outlined,
+                routeName: '/riderHome',
+              ),
+              _buildRoleCard(
+                context: context,
+                title: "Vendor",
+                subtitle: "Manage inventory, set operations, and track platform sales.",
+                icon: Icons.storefront_outlined,
+                routeName: '/vendorHome',
+              ),
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -191,38 +88,7 @@ class UserSelectionPage extends StatelessWidget {
     );
   }
 
-  Widget _infoChip(IconData icon, String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 10,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white24,
-        borderRadius: BorderRadius.circular(50),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: Colors.white,
-            size: 18,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            text,
-            style: GoogleFonts.inter(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSelectionCard({
+  Widget _buildRoleCard({
     required BuildContext context,
     required String title,
     required String subtitle,
@@ -230,49 +96,41 @@ class UserSelectionPage extends StatelessWidget {
     required String routeName,
   }) {
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(.06),
-            blurRadius: 25,
-            offset: const Offset(0, 12),
-          ),
+            color: Colors.grey.shade200,
+            blurRadius: 15,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
+          )
         ],
       ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(26),
-        splashColor: brandGreen.withOpacity(.08),
-        highlightColor: Colors.transparent,
-        onTap: () async {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('userRole', title.toLowerCase());
-
-          if (context.mounted) {
-            Navigator.pushReplacementNamed(context, routeName);
-          }
-        },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
         child: Padding(
-          padding: const EdgeInsets.all(22),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   Container(
-                    width: 78,
-                    height: 78,
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: brandGreen.withOpacity(.12),
-                      borderRadius: BorderRadius.circular(22),
+                      color: brandGreen.withOpacity(0.12),
+                      shape: BoxShape.circle,
                     ),
                     child: Icon(
                       icon,
                       color: brandGreen,
-                      size: 42,
+                      size: 28,
                     ),
                   ),
-                  const SizedBox(width: 18),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,18 +138,18 @@ class UserSelectionPage extends StatelessWidget {
                         Text(
                           title,
                           style: GoogleFonts.inter(
-                            fontSize: 20,
                             fontWeight: FontWeight.w800,
-                            color: Colors.black,
+                            fontSize: 18,
+                            color: Colors.black87,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         Text(
                           subtitle,
                           style: GoogleFonts.inter(
-                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
                             color: Colors.grey.shade600,
-                            height: 1.5,
                           ),
                         ),
                       ],
