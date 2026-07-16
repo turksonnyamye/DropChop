@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "145488796912",
+    "project_id": "dropchop-de0a4",
+    "storage_bucket": "dropchop-de0a4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145488796912:android:0da2d61d09f3a3fd553635",
+        "android_client_info": {
+          "package_name": "com.example.campus_eats"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrKk69USuMTzqkuj53up3AiDGWwS5qYfE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
