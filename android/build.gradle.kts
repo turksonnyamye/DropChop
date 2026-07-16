@@ -4,7 +4,10 @@ allprojects {
         mavenCentral()
     }
 }
-
+plugins {
+    // Check that you have the Google services plugin
+    id("com.google.gms.google-services") version "4.4.2" apply false
+}
 val newBuildDir: Directory =
     rootProject.layout.buildDirectory
         .dir("../../build")
