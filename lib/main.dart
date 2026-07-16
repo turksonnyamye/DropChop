@@ -9,6 +9,7 @@ import 'screens/user_selection_page.dart';
 import 'rider/rider_home.dart';
 import 'vendor/vendor_home.dart';
 import 'buyer/buyer_page.dart'; // Renamed standard snake_case file path
+import 'services/chop_drop_database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
